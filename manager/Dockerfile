@@ -5,8 +5,10 @@
 # and layers on Tuwunel, MinIO, Element Web, and AI CLI tools.
 #
 # Build args:
-#   HIGRESS_REGISTRY  - base image registry (default: cn-hangzhou)
+#   HIGRESS_REGISTRY    - base image registry (default: cn-hangzhou)
 #   OPENCLAW_BASE_IMAGE - openclaw-base image (default: hiclaw/openclaw-base:latest)
+#   ELEMENT_WEB_VERSION - element-web git tag to build from (default: v1.12.12)
+#   ELEMENT_WEB_REPO    - element-web git repo URL (default: github.com/element-hq/element-web)
 # ============================================================
 
 ARG HIGRESS_REGISTRY=higress-registry.cn-hangzhou.cr.aliyuncs.com
@@ -21,8 +23,16 @@ FROM ${HIGRESS_REGISTRY}/higress/minio:20260216 AS minio
 # ============ Stage 3: MinIO Client (mc) ============
 FROM ${HIGRESS_REGISTRY}/higress/mc:20260216 AS mc
 
-# ============ Stage 4: Element Web ============
-FROM ${HIGRESS_REGISTRY}/higress/element-web:20260216 AS element-web
+# ============ Stage 4: Element Web (build from source) ============
+FROM ${HIGRESS_REGISTRY}/higress/node:24-bullseye AS element-web-builder
+ARG ELEMENT_WEB_VERSION=v1.12.12
+ARG ELEMENT_WEB_REPO=https://github.com/element-hq/element-web.git
+
+WORKDIR /src
+RUN git clone --depth 1 --branch ${ELEMENT_WEB_VERSION} ${ELEMENT_WEB_REPO} .
+RUN corepack enable && pnpm install
+RUN VERSION=${ELEMENT_WEB_VERSION#v} pnpm --dir apps/web build
+RUN cp apps/web/config.sample.json apps/web/webapp/config.json
 
 # ============ Final Image: Based on openclaw-base ============
 # openclaw-base already includes: all-in-one + Node.js 22 + OpenClaw + mcporter + common tools
@@ -43,7 +53,7 @@ COPY --from=minio /usr/bin/minio /usr/local/bin/minio
 COPY --from=mc /usr/bin/mc /usr/local/bin/mc
 
 # Element Web static files
-COPY --from=element-web /app /opt/element-web
+COPY --from=element-web-builder /src/apps/web/webapp /opt/element-web
 
 # ---- Install AI coding CLI tools (Manager-only) ----
 RUN npm install -g @google/gemini-cli @anthropic-ai/claude-code

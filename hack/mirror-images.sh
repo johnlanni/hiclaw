@@ -53,8 +53,8 @@ IMAGES=(
     "ghcr.io/matrix-construct/tuwunel:main|tuwunel|${DATE_TAG}"
     "quay.io/minio/minio:latest|minio|${DATE_TAG}"
     "quay.io/minio/mc:latest|mc|${DATE_TAG}"
-    "docker.io/vectorim/element-web:latest|element-web|${DATE_TAG}"
-    "docker.io/library/node:20-slim|node|20-slim"
+    "docker.io/library/node:24-bullseye|node|24-bullseye"
+    "docker.io/library/python:3.11-slim|python|3.11-slim"
     "docker.io/library/ubuntu:24.04|ubuntu|24.04"
 )
 
