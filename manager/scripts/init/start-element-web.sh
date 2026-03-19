@@ -66,7 +66,6 @@ server {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
         # Disable upstream compression so sub_filter can modify HTML responses
         proxy_set_header Accept-Encoding "";
         proxy_read_timeout 3600s;
