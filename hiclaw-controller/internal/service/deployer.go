@@ -300,8 +300,9 @@ func (d *Deployer) DeployManagerConfig(ctx context.Context, req ManagerDeployReq
 	agentPrefix := fmt.Sprintf("agents/%s", req.Name)
 
 	// --- openclaw.json ---
+	// Manager's Matrix username is always "manager" regardless of CR name.
 	configJSON, err := d.agentConfig.GenerateOpenClawConfig(agentconfig.WorkerConfigRequest{
-		WorkerName:  req.Name,
+		WorkerName:  "manager",
 		MatrixToken: req.MatrixToken,
 		GatewayKey:  req.GatewayKey,
 		ModelName:   req.Spec.Model,
