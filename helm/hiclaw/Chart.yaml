@@ -2,7 +2,7 @@ apiVersion: v2
 name: hiclaw
 description: HiClaw - AI Agent Teams with Matrix-based collaboration and human-in-the-loop oversight
 type: application
-version: 1.0.10-rc1
+version: 1.1.0-rc.1
 appVersion: "1.0.10-rc1"
 
 keywords:
