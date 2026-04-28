@@ -726,11 +726,12 @@ if [ -f /root/manager-workspace/openclaw.json ]; then
        ' \
        /root/manager-workspace/openclaw.json > /tmp/openclaw.json.tmp && \
         mv /tmp/openclaw.json.tmp /root/manager-workspace/openclaw.json
-    # Disable openclaw's observe-recovery mechanism which would otherwise restore
-    # a stale .bak on gateway restart, undoing user customizations (plugins, channels).
-    # By removing .bak and config-health state, observe-recovery has no baseline to
-    # compare against and will not interfere with user config changes.
-    rm -f /root/manager-workspace/openclaw.json.bak
+    # Disable openclaw's observe-recovery mechanism which compares config against
+    # a lastKnownGood baseline in config-health.json. When meta is missing from the
+    # current file but present in the baseline, observe-recovery restores from .bak,
+    # undoing user customizations (plugins, channels, etc).
+    # Clearing config-health.json removes the baseline so observe-recovery won't
+    # interfere, while preserving .bak as a backup.
     rm -f /root/manager-workspace/.openclaw/logs/config-health.json
     # Verify the token was written correctly
     _written_token=$(jq -r '.channels.matrix.accessToken' /root/manager-workspace/openclaw.json 2>/dev/null)
